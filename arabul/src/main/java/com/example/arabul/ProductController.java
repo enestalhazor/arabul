@@ -78,4 +78,13 @@ public class ProductController {
             return ResponseEntity.status(404).body("DB error");
         }
     }
+
+    @GetMapping("/search")
+    public ResponseEntity<?> GetProductByTerm(@RequestParam("term") String term) {
+        try {
+            return ResponseEntity.ok(repository.productByTerm(term));
+        } catch (Exception e) {
+            return ResponseEntity.status(404).body("Error fetching product: " + e.getMessage());
+        }
+    }
 }

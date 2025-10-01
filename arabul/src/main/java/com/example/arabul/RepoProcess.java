@@ -48,6 +48,19 @@ public class RepoProcess {
         }
     }
 
+    public List<Map<String, Object>> productByTerm(String term) {
+
+        String sql = "SELECT * FROM products WHERE name ILIKE ?";
+        try {
+            String searchTerm = "%" + term + "%";
+            return jdbcTemplate.queryForList(sql, searchTerm);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return List.of();
+        }
+    }
+
+
     public boolean deleteById(Integer id) {
         String sql = "DELETE FROM products WHERE id=?";
         try {

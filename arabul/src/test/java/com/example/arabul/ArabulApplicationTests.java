@@ -81,4 +81,20 @@ class ArabulApplicationTests {
         String name = root.get("NAME").asText();
         assertEquals("hikayeler", name);
     }
+
+    @Test
+    void testByTermProductsOk() throws Exception {
+        var mvcResult = mockMvc.perform(get("/api/products/search?term=hikayeler"))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        String response = mvcResult.getResponse().getContentAsString();
+        ObjectMapper objectMapper = new ObjectMapper();
+        JsonNode root = objectMapper.readTree(response);
+        JsonNode firstProduct = root.get(0);
+        System.out.println(response);
+
+        String name = firstProduct.get("NAME").asText();
+        assertEquals("hikayeler", name);
+    }
 }
