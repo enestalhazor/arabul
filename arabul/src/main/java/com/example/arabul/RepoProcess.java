@@ -36,4 +36,25 @@ public class RepoProcess {
             return List.of();
         }
     }
+
+    public Map<String, Object> productById(Integer id) {
+
+        String sql = "SELECT * FROM products WHERE id=?";
+        try {
+            return jdbcTemplate.queryForMap(sql, id);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Map.of();
+        }
+    }
+
+    public boolean deleteById(Integer id) {
+        String sql = "DELETE FROM products WHERE id=?";
+        try {
+            return jdbcTemplate.update(sql, id) > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 }

@@ -55,4 +55,27 @@ public class ProductController {
             return ResponseEntity.status(404).body("Error fetching products: " + e.getMessage());
         }
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<?> GetProductById(@PathVariable Integer id) {
+        try {
+            return ResponseEntity.ok(repository.productById(id));
+        } catch (Exception e) {
+            return ResponseEntity.status(404).body("Error fetching product: " + e.getMessage());
+        }
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> DeleteById(@PathVariable Integer id) {
+        try {
+            if (repository.deleteById(id)) {
+                return ResponseEntity.ok("Product deleted");
+            } else {
+                return ResponseEntity.status(404).body("Not found");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(404).body("DB error");
+        }
+    }
 }
