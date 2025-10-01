@@ -3,6 +3,9 @@ package com.example.arabul;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+import java.util.Map;
+
 @Repository
 public class RepoProcess {
 
@@ -20,6 +23,17 @@ public class RepoProcess {
         } catch (Exception e) {
             e.printStackTrace();
             return false;
+        }
+    }
+
+    public List<Map<String, Object>> products() {
+
+        String sql = "SELECT * FROM products";
+        try {
+            return jdbcTemplate.queryForList(sql);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return List.of();
         }
     }
 }

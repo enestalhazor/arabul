@@ -7,4 +7,4 @@ create table products (
     category varchar(255) not null
 );
 
-insert into public.arabul (name, description, photo, price, category) VALUES ('hikayeler', 'hikaye', 'hikaye.jpg', '123.50' 'book');
+insert into products (name, description, photo, price, category) VALUES ('hikayeler', 'hikaye', 'hikaye.jpg', 123.50, 'book');

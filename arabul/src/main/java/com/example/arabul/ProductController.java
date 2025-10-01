@@ -1,5 +1,6 @@
 package com.example.arabul;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -43,6 +44,15 @@ public class ProductController {
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(500).body("Bad request " + e.getMessage());
+        }
+    }
+
+    @GetMapping
+    public ResponseEntity<?> GetProducts() {
+        try {
+            return ResponseEntity.ok(repository.products());
+        } catch (Exception e) {
+            return ResponseEntity.status(404).body("Error fetching products: " + e.getMessage());
         }
     }
 }
