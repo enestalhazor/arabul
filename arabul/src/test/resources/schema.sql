@@ -8,3 +8,4 @@ create table products (
 );
 
 insert into products (name, description, photo, price, category) VALUES ('hikayeler', 'hikaye', 'hikaye.jpg', 123.50, 'book');
+insert into products (name, description, photo, price, category) VALUES ('masallar', 'masal', 'masal.jpg', 123.50, 'book');

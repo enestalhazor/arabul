@@ -7,19 +7,31 @@ import java.util.List;
 import java.util.Map;
 
 @Repository
-public class RepoProcess {
+public class ProductRepository {
 
     public JdbcTemplate jdbcTemplate;
 
-    public RepoProcess(JdbcTemplate jdbcTemplate) {
+    public ProductRepository(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    public boolean save(String name, String description, String photo, float price, String category) {
+    public boolean clear() {
+
+        String sql = "DELETE FROM products";
+        try {
+            jdbcTemplate.execute(sql);
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean save(String name, String description, String photo, String price, String category) {
 
         String sql = "INSERT INTO products(name, description, photo, price, category) VALUES (?, ?, ?, ?, ?)";
         try {
-            return jdbcTemplate.update(sql, name, description, photo, price, category) > 0;
+            return jdbcTemplate.update(sql, name, description, photo, String.valueOf(price), category) > 0;
         } catch (Exception e) {
             e.printStackTrace();
             return false;
@@ -70,4 +82,5 @@ public class RepoProcess {
             return false;
         }
     }
+
 }

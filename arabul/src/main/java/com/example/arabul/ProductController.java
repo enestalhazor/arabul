@@ -1,6 +1,5 @@
 package com.example.arabul;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -9,14 +8,16 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/products")
 public class ProductController {
 
-    private final RepoProcess repository;
+    private final ProductRepository repository;
 
-    public ProductController(RepoProcess repository) {
+    public ProductController(ProductRepository repository) {
         this.repository = repository;
     }
 
@@ -35,7 +36,7 @@ public class ProductController {
                 photo.transferTo(uploadPath.toFile());
             }
 
-            if (repository.save(name, description, fileName, price, category)) {
+            if (repository.save(name, description, fileName, price.toString(), category)) {
                 return ResponseEntity.ok("Product inserted.");
             } else {
                 return ResponseEntity.status(500).body("DB Error");
@@ -50,7 +51,11 @@ public class ProductController {
     @GetMapping
     public ResponseEntity<?> GetProducts() {
         try {
-            return ResponseEntity.ok(repository.products());
+            List<Map<String, Object>> products = repository.products();
+            if (products == null) {
+                return ResponseEntity.status(404).body("No products found");
+            }
+            return ResponseEntity.ok(products);
         } catch (Exception e) {
             return ResponseEntity.status(404).body("Error fetching products: " + e.getMessage());
         }
@@ -59,6 +64,10 @@ public class ProductController {
     @GetMapping("/{id}")
     public ResponseEntity<?> GetProductById(@PathVariable Integer id) {
         try {
+            var products = repository.productById(id);
+            if (products == null || products.isEmpty()) {
+                return ResponseEntity.status(404).body("No products found for id: " + id);
+            }
             return ResponseEntity.ok(repository.productById(id));
         } catch (Exception e) {
             return ResponseEntity.status(404).body("Error fetching product: " + e.getMessage());
@@ -82,7 +91,11 @@ public class ProductController {
     @GetMapping("/search")
     public ResponseEntity<?> GetProductByTerm(@RequestParam("term") String term) {
         try {
-            return ResponseEntity.ok(repository.productByTerm(term));
+            var products = repository.productByTerm(term);
+            if (products == null || products.isEmpty()) {
+                return ResponseEntity.status(404).body("No products found for term: " + term);
+            }
+            return ResponseEntity.ok(products);
         } catch (Exception e) {
             return ResponseEntity.status(404).body("Error fetching product: " + e.getMessage());
         }
