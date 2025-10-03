@@ -33,4 +33,15 @@ public class UserRepository {
         }
     }
 
+    public Integer check(String email, String password) {
+
+        String sql = "SELECT id FROM users WHERE email=? AND password=?";
+        try {
+            Integer count = jdbcTemplate.queryForObject(sql, Integer.class, email, password);
+            return count;
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
 }
