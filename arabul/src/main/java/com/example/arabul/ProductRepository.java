@@ -15,18 +15,6 @@ public class ProductRepository {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    public boolean clear() {
-
-        String sql = "DELETE FROM products";
-        try {
-            jdbcTemplate.execute(sql);
-            return true;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
     public boolean save(String name, String description, String photo, String price, String category) {
 
         String sql = "INSERT INTO products(name, description, photo, price, category) VALUES (?, ?, ?, ?, ?)";
