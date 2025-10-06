@@ -37,14 +37,14 @@ public class ProductController {
             }
 
             if (repository.save(name, description, fileName, price.toString(), category)) {
-                return ResponseEntity.ok("Product inserted.");
+                return ResponseEntity.ok(Map.of("info", "Product inserted."));
             } else {
-                return ResponseEntity.status(500).body("DB Error");
+                return ResponseEntity.status(500).body(Map.of("info", "DB Error"));
             }
 
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.status(500).body("Bad request " + e.getMessage());
+            return ResponseEntity.status(500).body(Map.of("info", "Bad request " + e.getMessage()));
         }
     }
 
@@ -53,11 +53,11 @@ public class ProductController {
         try {
             List<Map<String, Object>> products = repository.products();
             if (products == null) {
-                return ResponseEntity.status(404).body("No products found");
+                return ResponseEntity.status(404).body(Map.of("info", "No products found"));
             }
             return ResponseEntity.ok(products);
         } catch (Exception e) {
-            return ResponseEntity.status(404).body("Error fetching products: " + e.getMessage());
+            return ResponseEntity.status(404).body(Map.of("info", "Error fetching products: " + e.getMessage()));
         }
     }
 
@@ -66,11 +66,11 @@ public class ProductController {
         try {
             var products = repository.productById(id);
             if (products == null || products.isEmpty()) {
-                return ResponseEntity.status(404).body("No products found for id: " + id);
+                return ResponseEntity.status(404).body(Map.of("info", "No products found for id: " + id));
             }
             return ResponseEntity.ok(repository.productById(id));
         } catch (Exception e) {
-            return ResponseEntity.status(404).body("Error fetching product: " + e.getMessage());
+            return ResponseEntity.status(404).body(Map.of("info", "Error fetching product: " + e.getMessage()));
         }
     }
 
@@ -80,11 +80,11 @@ public class ProductController {
             if (repository.deleteById(id)) {
                 return ResponseEntity.ok("Product deleted");
             } else {
-                return ResponseEntity.status(404).body("Not found");
+                return ResponseEntity.status(404).body(Map.of("info","Not found"));
             }
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.status(404).body("DB error");
+            return ResponseEntity.status(404).body(Map.of("info", "DB error"));
         }
     }
 
@@ -93,11 +93,11 @@ public class ProductController {
         try {
             var products = repository.productByTerm(term);
             if (products == null || products.isEmpty()) {
-                return ResponseEntity.status(404).body("No products found for term: " + term);
+                return ResponseEntity.status(404).body(Map.of("info", "No products found for term: " + term));
             }
             return ResponseEntity.ok(products);
         } catch (Exception e) {
-            return ResponseEntity.status(404).body("Error fetching product: " + e.getMessage());
+            return ResponseEntity.status(404).body(Map.of("info", "Error fetching product: " + e.getMessage()));
         }
     }
 }

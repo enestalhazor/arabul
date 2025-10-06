@@ -19,7 +19,7 @@ public class ProductRepository {
 
         String sql = "INSERT INTO products(name, description, photo, price, category) VALUES (?, ?, ?, ?, ?)";
         try {
-            return jdbcTemplate.update(sql, name, description, photo, String.valueOf(price), category) > 0;
+            return jdbcTemplate.update(sql, name, description, photo, Float.valueOf(price), category) > 0;
         } catch (Exception e) {
             e.printStackTrace();
             return false;

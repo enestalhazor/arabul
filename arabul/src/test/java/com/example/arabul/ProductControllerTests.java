@@ -50,7 +50,6 @@ class ProductControllerTests {
                 .param("description", "masal")
                 .param("price", "196.50")
                 .param("category", "book"));
-
     }
 
     // missing file
