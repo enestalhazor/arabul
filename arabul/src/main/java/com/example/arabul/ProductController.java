@@ -1,6 +1,7 @@
 package com.example.arabul;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -19,6 +20,16 @@ public class ProductController {
 
     public ProductController(ProductRepository repository) {
         this.repository = repository;
+    }
+
+    @RestControllerAdvice
+    public class GlobalExceptionHandler {
+
+        @ExceptionHandler(MissingServletRequestParameterException.class)
+        public ResponseEntity<Map<String, String>> handleMissingParams(MissingServletRequestParameterException ex) {
+            return ResponseEntity.status(400)
+                    .body(Map.of("info", "Missing required fields"));
+        }
     }
 
     @PostMapping
@@ -78,9 +89,9 @@ public class ProductController {
     public ResponseEntity<?> DeleteById(@PathVariable Integer id) {
         try {
             if (repository.deleteById(id)) {
-                return ResponseEntity.ok("Product deleted");
+                return ResponseEntity.ok(Map.of("info", "Product deleted"));
             } else {
-                return ResponseEntity.status(404).body(Map.of("info","Not found"));
+                return ResponseEntity.status(404).body(Map.of("info", "Not found"));
             }
         } catch (Exception e) {
             e.printStackTrace();

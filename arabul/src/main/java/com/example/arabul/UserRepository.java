@@ -15,17 +15,6 @@ public class UserRepository {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    public boolean save(String name, String email, String phone, String password, String address, String profilePic) {
-
-        String sql = "INSERT INTO users(name, email, phone, password, address, profile_picture) VALUES (?, ?, ?, ?, ?, ?)";
-        try {
-            return jdbcTemplate.update(sql, name, email, phone, password, address, profilePic) > 0;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
     public boolean checkIsEmailTaken(String email) {
 
         String sql = "SELECT COUNT(*) FROM users WHERE email=?";
@@ -33,6 +22,17 @@ public class UserRepository {
             Integer count = jdbcTemplate.queryForObject(sql, Integer.class, email);
             return count != null && count > 0;
         } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public boolean save(String name, String email, String phone, String password, String address, String profilePic) {
+
+        String sql = "INSERT INTO users(name, email, phone, password, address, profile_picture) VALUES (?, ?, ?, ?, ?, ?)";
+        try {
+            return jdbcTemplate.update(sql, name, email, phone, password, address, profilePic) > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
             return false;
         }
     }

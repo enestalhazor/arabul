@@ -5,6 +5,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -41,6 +42,16 @@ public class UserController {
         }
     }
 
+    @RestControllerAdvice
+    public class GlobalExceptionHandler {
+
+        @ExceptionHandler(MissingServletRequestParameterException.class)
+        public ResponseEntity<Map<String, String>> handleMissingParams(MissingServletRequestParameterException ex) {
+            return ResponseEntity.status(400)
+                    .body(Map.of("info", "Missing required fields"));
+        }
+    }
+
     @PostMapping
     public ResponseEntity<?> Register(@RequestParam String name, @RequestParam String email, @RequestParam(value = "phone", required = false) String phone, @RequestParam String password, @RequestParam String address, @RequestParam(value = "profile_picture", required = false) MultipartFile profilePic) throws IOException {
         String fileName = "";
@@ -62,13 +73,6 @@ public class UserController {
                 profilePic.transferTo(uploadPath.toFile());
             }
 
-            if (name == null || name.isBlank() ||
-                    email == null || email.isBlank() ||
-                    password == null || password.isBlank() ||
-                    address == null || address.isBlank()) {
-                return ResponseEntity.status(400).body(Map.of("info", "Missing required fields"));
-            }
-
             if (repository.checkIsEmailTaken(email)) {
                 return ResponseEntity.status(422).body(Map.of("info", "Email taken"));
             }
@@ -81,8 +85,8 @@ public class UserController {
                 return ResponseEntity.status(400).body(Map.of("info", "Password length should be more than 4 character"));
             }
 
-            if (phone != null || !phone.isBlank()) {
-                if (phone.matches("^\\\\d{3}-\\\\d{3}-\\\\d{4}$")) {
+            if (phone != null && !phone.isBlank()) {
+                if (!phone.matches("^5\\d{9}$")) {
                     return ResponseEntity.status(400).body(Map.of("info", "Invalid phone format"));
                 }
             }
@@ -90,13 +94,13 @@ public class UserController {
             String hashedPassword = HashService.hashPassword(password);
 
             if (repository.save(name, email, phone, hashedPassword, address, fileName)) {
-                return ResponseEntity.ok().body(Map.of("info", "User ınserted"));
+                return ResponseEntity.ok().body(Map.of("info", "User inserted"));
             } else {
                 return ResponseEntity.badRequest().body(Map.of("info", "Bad Request"));
             }
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.status(500).body(Map.of("info", "Bad request " + e.getMessage()));
+            return ResponseEntity.status(400).body(Map.of("info", "Bad request " + e.getMessage()));
         }
     }
 

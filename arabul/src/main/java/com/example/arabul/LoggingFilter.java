@@ -31,8 +31,6 @@ public class LoggingFilter extends OncePerRequestFilter {
             System.out.println("Date: " + date);
 
             chain.doFilter(request, response);
-        } catch (JwtException e) {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         } finally {
             System.out.println("Method: " + method);
             System.out.println("Path: " + path);
