@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.ActiveProfiles;
@@ -20,6 +21,7 @@ import static org.mockito.Mockito.mock;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
@@ -325,6 +327,7 @@ class UserControllerTests {
     }
 
     @Test
+    @Transactional
     void loginMissingFieldsTest() throws Exception {
         // Missing password
         mockMvc.perform(post("/api/users/login")
@@ -348,6 +351,145 @@ class UserControllerTests {
                 .andExpect(jsonPath("$.info").value("Missing required field or fields"));
     }
 
+    @Test
+    void testGetUserInfoIsOk() throws Exception {
 
+        String token = JWTService.create("enes@gmail.com", 1);
+        var result = mockMvc.perform(get("/api/users/1")
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        String jsonResponse = result.getResponse().getContentAsString();
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode jsonNode = mapper.readTree(jsonResponse);
+        String email = jsonNode.get("EMAIL").asText();
+
+        assertEquals("enes@gmail.com", email);
+    }
+
+    @Test
+    @Transactional
+    void testNoTokenForGetUserInfo() throws Exception {
+        mockMvc.perform(get("/api/users/1"))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.info").value("Unauthorized"));
+    }
+
+    @Test
+    @Transactional
+    void testInvalidTokenForGetUserInfo() throws Exception {
+
+        String token = JWTService.create("enes@gmail.com", 2);
+        mockMvc.perform(get("/api/users/1")
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.info").value("Unauthorized"));
+
+    }
+
+    @Test
+    @Transactional
+    void testNoUserForGetUserInfo() throws Exception {
+
+        String token = JWTService.create("enes@gmail.com", 3);
+        mockMvc.perform(get("/api/users/3")
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.info").value("Not found user for id: 3"));
+    }
+
+    //------------------------------------------------------------------------------------------------------
+
+    @Test
+    @Transactional
+    void testEditUserInfoNoToken() throws Exception {
+
+        MockMultipartFile file = new MockMultipartFile(
+                "profile_picture",
+                "profile.jpeg",
+                "image/jpeg",
+                "dummy-image-content".getBytes());
+
+        String email = "talha@gmail.com";
+
+        String token = JWTService.create("enes@gmail.com", 1);
+        var result = mockMvc.perform(put("/api/users/1")
+                        .contentType(MediaType.MULTIPART_FORM_DATA)
+                        .param("name", "talha")
+                        .param("email", "talha@gmail.com")
+                        .param("phone", "5014848484")
+                        .param("password", "talha1234")
+                        .param("address", "Ankara/Cankaya"))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @Transactional
+    void testEditUserInfoInvalidToken() throws Exception {
+
+        MockMultipartFile file = new MockMultipartFile(
+                "profile_picture",
+                "profile.jpeg",
+                "image/jpeg",
+                "dummy-image-content".getBytes());
+
+        String email = "talha@gmail.com";
+
+        String token = JWTService.create("enes@gmail.com", 2);
+        var result = mockMvc.perform(put("/api/users/1")
+                        .contentType(MediaType.MULTIPART_FORM_DATA)
+                        .header("Authorization", "Bearer " + token)
+                        .param("name", "talha")
+                        .param("email", "talha@gmail.com")
+                        .param("phone", "5014848484")
+                        .param("password", "talha1234")
+                        .param("address", "Ankara/Cankaya"))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.info").value("Unauthorized"));
+    }
+
+    @Test
+    @Transactional
+    void testEditUserInfoUserNotFound() throws Exception {
+
+        MockMultipartFile file = new MockMultipartFile(
+                "profile_picture",
+                "profile.jpeg",
+                "image/jpeg",
+                "dummy-image-content".getBytes());
+
+        String email = "talha@gmail.com";
+
+        String token = JWTService.create("enes@gmail.com", 3);
+        var result = mockMvc.perform(put("/api/users/3")
+                        .contentType(MediaType.MULTIPART_FORM_DATA)
+                        .header("Authorization", "Bearer " + token)
+                        .param("name", "talha")
+                        .param("email", "talha@gmail.com")
+                        .param("phone", "5014848484")
+                        .param("password", "talha1234")
+                        .param("address", "Ankara/Cankaya"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.info").value("No user found for id: -1"));
+    }
+
+    @Test
+    @Transactional
+    void testEditUserInfoIsOk() throws Exception {
+
+        String token = JWTService.create("eness@gmail.com", 1);
+        mockMvc.perform(put("/api/users/1")
+                        .contentType(MediaType.MULTIPART_FORM_DATA)
+                        .header("Authorization", "Bearer " + token)
+                        .param("name", "bora")
+                        .param("email", "bora@gmail.com")
+                        .param("phone", "5014848484")
+                        .param("password", "bora1234")
+                        .param("address", "Ankara/Cankaya"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.info").value("User infos edited id: 1"));
+
+    }
 }
 

@@ -2,7 +2,9 @@ package com.example.arabul;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import org.apache.coyote.Response;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -124,11 +126,16 @@ public class UserController {
     @GetMapping("/{id}")
     public ResponseEntity<?> GetUserInfo(@PathVariable Integer id) throws NoSuchAlgorithmException {
 
+        if (id != RequestContext.getUserId()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("info", "Unauthorized"));
+        }
+
         try {
+
             var products = repository.userById(id);
 
             if (products == null || products.isEmpty()) {
-                return ResponseEntity.status(404).body(Map.of("info", "No user found for id: " + id));
+                return ResponseEntity.status(404).body(Map.of("info", "Not found user for id: " + id));
             }
 
             Integer userid = RequestContext.getUserId();
@@ -153,6 +160,10 @@ public class UserController {
                                           @RequestParam(value = "password", required = false) String password,
                                           @RequestParam(value = "address", required = false) String address,
                                           @RequestParam(value = "profile_picture", required = false) MultipartFile profilePic) throws NoSuchAlgorithmException, IOException {
+
+        if (id != RequestContext.getUserId()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("info", "Unauthorized"));
+        }
 
         String fileName = "";
         String hashedPassword = "";
@@ -208,10 +219,11 @@ public class UserController {
             }
 
             Integer userId = RequestContext.getUserId();
+            Integer userId2 = repository.getIdByEmail(email);
 
-            if (Objects.equals(userId, result)) {
+            if (Objects.equals(userId, userId2)) {
 
-                return ResponseEntity.ok(Map.of("info", "User infos edited id: " + result));
+                return ResponseEntity.ok(Map.of("info", "User infos edited id: " + userId2));
             }
             return null;
         } catch (Exception e) {

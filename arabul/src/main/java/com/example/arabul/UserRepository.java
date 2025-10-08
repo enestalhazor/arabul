@@ -59,6 +59,17 @@ public class UserRepository {
         }
     }
 
+    public Integer getIdByEmail(String email) {
+
+        String sql = "SELECT id FROM users WHERE email=?";
+        try {
+            return jdbcTemplate.queryForObject(sql, Integer.class, email);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return -1;
+        }
+    }
+
     public Integer editUserInfo(Integer id, String name, String email, String phone, String password, String address, String profilePic) {
 
         try {
@@ -94,10 +105,10 @@ public class UserRepository {
             }
 
             sql.setLength(sql.length() - 2);
-            sql.append(" WHERE id=? RETURNING id");
+            sql.append(" WHERE id=?");
             params.add(id);
 
-            return jdbcTemplate.queryForObject(sql.toString(), Integer.class, params.toArray());
+            return jdbcTemplate.update(sql.toString(), params.toArray()) > 0 ? 1 : -1;
         } catch (Exception e) {
             e.printStackTrace();
             return -1;
