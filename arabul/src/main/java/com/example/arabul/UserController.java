@@ -1,11 +1,10 @@
 package com.example.arabul;
 
-import com.auth0.jwt.JWT;
-import org.springframework.format.annotation.DateTimeFormat;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.MissingServletRequestParameterException;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -14,11 +13,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.NoSuchAlgorithmException;
-import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
+@Validated
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
@@ -42,22 +41,16 @@ public class UserController {
         }
     }
 
-    @RestControllerAdvice
-    public class GlobalExceptionHandler {
-
-        @ExceptionHandler(MissingServletRequestParameterException.class)
-        public ResponseEntity<Map<String, String>> handleMissingParams(MissingServletRequestParameterException ex) {
-            return ResponseEntity.status(400)
-                    .body(Map.of("info", "Missing required fields"));
-        }
-    }
-
     @PostMapping
-    public ResponseEntity<?> Register(@RequestParam String name, @RequestParam String email, @RequestParam(value = "phone", required = false) String phone, @RequestParam String password, @RequestParam String address, @RequestParam(value = "profile_picture", required = false) MultipartFile profilePic) throws IOException {
-        String fileName = "";
+    public ResponseEntity<?> Register(@NotBlank(message = "Name cannot be empty") @RequestParam String name,
+                                      @NotBlank(message = "Email cannot be empty") @RequestParam String email,
+                                      @RequestParam(value = "phone", required = false) String phone,
+                                      @NotBlank(message = "Password cannot be empty") @Size(min = 4, message = "Password should be more than 4 characters") @RequestParam String password,
+                                      @NotBlank(message = "Address cannot be empty") @RequestParam String address,
+                                      @RequestParam(value = "profile_picture", required = false) MultipartFile profilePic) throws IOException {
 
         try {
-
+            String fileName = "";
             if (profilePic != null && !profilePic.isEmpty()) {
 
                 String contentType = profilePic.getContentType();
@@ -79,10 +72,6 @@ public class UserController {
 
             if (!email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")) {
                 return ResponseEntity.status(400).body(Map.of("info", "Invalid email format"));
-            }
-
-            if (password.length() < 4) {
-                return ResponseEntity.status(400).body(Map.of("info", "Password length should be more than 4 character"));
             }
 
             if (phone != null && !phone.isBlank()) {
@@ -109,12 +98,12 @@ public class UserController {
 
         if (request.getPassword() == null || request.getPassword().isBlank() ||
                 request.getEmail() == null || request.getEmail().isBlank()) {
-            return ResponseEntity.status(400).body(Map.of("info", "Missing required fields"));
+            return ResponseEntity.status(400).body(Map.of("info", "Missing required field or fields"));
         }
         try {
             String hashedPassword = HashService.hashPassword(request.getPassword());
             Integer id = repository.check(request.getEmail(), hashedPassword);
-            if (id != null || id > 0) {
+            if (id != null && id > 0) {
 
                 String email = request.getEmail();
                 String token = JWTService.create(email, id);
@@ -133,12 +122,7 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> GetUserInfo(@RequestHeader(value = "Authorization", required = false) String authHeader, @PathVariable Integer id) throws NoSuchAlgorithmException {
-
-        if (!JWTService.checkToken(authHeader)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("info", "Missing or invalid Authorization header"));
-        }
+    public ResponseEntity<?> GetUserInfo(@PathVariable Integer id) throws NoSuchAlgorithmException {
 
         try {
             var products = repository.userById(id);
@@ -163,18 +147,12 @@ public class UserController {
 
     @PutMapping("/{id}")
     public ResponseEntity<?> EditUserInfo(@PathVariable Integer id,
-                                          @RequestHeader(value = "Authorization", required = false) String authHeader,
                                           @RequestParam(value = "name", required = false) String name,
                                           @RequestParam(value = "email", required = false) String email,
                                           @RequestParam(value = "phone", required = false) String phone,
                                           @RequestParam(value = "password", required = false) String password,
                                           @RequestParam(value = "address", required = false) String address,
                                           @RequestParam(value = "profile_picture", required = false) MultipartFile profilePic) throws NoSuchAlgorithmException, IOException {
-
-        if (!JWTService.checkToken(authHeader)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("info", "Missing or invalid Authorization header"));
-        }
 
         String fileName = "";
         String hashedPassword = "";

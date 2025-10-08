@@ -228,7 +228,5 @@ class ProductControllerTests {
         mockMvc.perform(get("/api/products/search?term=tarraklar"))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.info").value("No products found for term: tarraklar"));
-
-
     }
 }

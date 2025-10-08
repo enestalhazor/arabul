@@ -1,5 +1,9 @@
 package com.example.arabul;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,9 +15,9 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -27,6 +31,9 @@ class UserControllerTests {
 
     @Autowired
     private MockMvc mockMvc;
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     UserRepository repository = mock(UserRepository.class);
 
@@ -91,7 +98,6 @@ class UserControllerTests {
                         .param("address", "ankara/etimesgut"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.info").value("Missing required fields"));
-
     }
 
     // missing address
@@ -175,7 +181,7 @@ class UserControllerTests {
                         .param("password", "1")
                         .param("address", "ankara/etimesgut"))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.info").value("Password length should be more than 4 character"));
+                .andExpect(jsonPath("$.info").value("Password should be more than 4 characters"));
     }
 
     @Test
@@ -249,5 +255,99 @@ class UserControllerTests {
         assertNotNull(count);
         assertTrue(count == 1);
     }
+
+    @Test
+    @Transactional
+    void loginTest() throws Exception {
+
+        MockMultipartFile file = new MockMultipartFile(
+                "profile_picture",
+                "profile.jpeg",
+                "image/jpeg",
+                "dummy-image-content".getBytes());
+
+        String email = "talha@gmail.com";
+
+        mockMvc.perform(MockMvcRequestBuilders.multipart("/api/users")
+                        .file(file)
+                        .param("name", "talha")
+                        .param("email", email)
+                        .param("phone", "5512343204")
+                        .param("password", "12345")
+                        .param("address", "ankara/etimesgut"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.info").value("User inserted"));
+
+        var resultActions = mockMvc.perform(post("/api/users/login")
+                        .contentType("application/json")
+                        .content("{\"email\":\"talha@gmail.com\",\"password\":\"12345\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.token").exists());
+
+        String responseJson = resultActions.andReturn().getResponse().getContentAsString();
+        JsonNode jsonNode = objectMapper.readTree(responseJson);
+        String token = jsonNode.get("token").asText();
+        Claims claims = Jwts.parser()
+                .setSigningKey(JWTService.getKey())
+                .parseClaimsJws(token)
+                .getBody();
+
+        String userEmail = claims.get("email", String.class);
+        assertEquals("talha@gmail.com", userEmail);
+    }
+
+    @Test
+    @Transactional
+    void loginTestForNotFound() throws Exception {
+
+        MockMultipartFile file = new MockMultipartFile(
+                "profile_picture",
+                "profile.jpeg",
+                "image/jpeg",
+                "dummy-image-content".getBytes());
+
+        String email = "talha@gmail.com";
+
+        mockMvc.perform(MockMvcRequestBuilders.multipart("/api/users")
+                        .file(file)
+                        .param("name", "talha")
+                        .param("email", email)
+                        .param("phone", "5512343204")
+                        .param("password", "12345")
+                        .param("address", "ankara/etimesgut"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.info").value("User inserted"));
+
+        mockMvc.perform(post("/api/users/login")
+                        .contentType("application/json")
+                        .content("{\"email\":\"talha@gmail.com\",\"password\":\"1345\"}"))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void loginMissingFieldsTest() throws Exception {
+        // Missing password
+        mockMvc.perform(post("/api/users/login")
+                        .contentType("application/json")
+                        .content("{\"email\":\"talha@gmail.com\"}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.info").value("Missing required field or fields"));
+
+        // Missing email
+        mockMvc.perform(post("/api/users/login")
+                        .contentType("application/json")
+                        .content("{\"password\":\"12345\"}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.info").value("Missing required field or fields"));
+
+        // Both missing
+        mockMvc.perform(post("/api/users/login")
+                        .contentType("application/json")
+                        .content("{}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.info").value("Missing required field or fields"));
+    }
+
+
 }
 
