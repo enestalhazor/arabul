@@ -123,6 +123,16 @@ public class UserController {
         }
     }
 
+    private Map<String, Object> lowerCaseMap(Map<String, Object> map) {
+        Map<String, Object> lowerCaseMap = new HashMap<>();
+
+        for (Map.Entry<String, Object> entry : map.entrySet()) {
+            lowerCaseMap.put(entry.getKey().toLowerCase(), entry.getValue());
+        }
+
+        return lowerCaseMap;
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<?> GetUserInfo(@PathVariable Integer id) throws NoSuchAlgorithmException {
 
@@ -141,7 +151,7 @@ public class UserController {
             Integer userid = RequestContext.getUserId();
 
             if (Objects.equals(userid, id)) {
-                return ResponseEntity.ok(products);
+                return ResponseEntity.ok(lowerCaseMap(products));
             }
 
             return null;

@@ -363,7 +363,7 @@ class UserControllerTests {
         String jsonResponse = result.getResponse().getContentAsString();
         ObjectMapper mapper = new ObjectMapper();
         JsonNode jsonNode = mapper.readTree(jsonResponse);
-        String email = jsonNode.get("EMAIL").asText();
+        String email = jsonNode.get("email").asText();
 
         assertEquals("enes@gmail.com", email);
     }
@@ -478,7 +478,7 @@ class UserControllerTests {
     @Transactional
     void testEditUserInfoIsOk() throws Exception {
 
-        String token = JWTService.create("eness@gmail.com", 1);
+        String token = JWTService.create("enes@gmail.com", 1);
         mockMvc.perform(put("/api/users/1")
                         .contentType(MediaType.MULTIPART_FORM_DATA)
                         .header("Authorization", "Bearer " + token)
