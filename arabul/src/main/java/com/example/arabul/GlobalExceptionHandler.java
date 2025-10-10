@@ -22,6 +22,10 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<Map<String, Object>> handleConstraintViolation(ConstraintViolationException ex) {
+        // ConstraintViolationException contain ConstraintViolation objects
+        // .getConstraintViolations give this objects, .stream() give stream this violation objects.
+        // .map(ConstraintViolation::getMessage => //just get violation message by object) => ["violation", "violation"]...
+        // .collect(Collectors.joining(", ") => Collect all mesages in one string
         String messages = ex.getConstraintViolations().stream()
                 .map(ConstraintViolation::getMessage)
                 .collect(Collectors.joining(", "));

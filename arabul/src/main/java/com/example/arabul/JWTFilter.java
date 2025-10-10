@@ -22,7 +22,7 @@ public class JWTFilter extends OncePerRequestFilter {
         try {
             String autho = request.getHeader("Authorization");
             if (autho != null && autho.startsWith("Bearer ")) {
-                String token = autho.substring(7); // remove "Bearer " prefix
+                String token = autho.substring(7); // remove "Bearer"
 
                 Claims claims = Jwts.parserBuilder()
                         .setSigningKey(JWTService.getKey())
