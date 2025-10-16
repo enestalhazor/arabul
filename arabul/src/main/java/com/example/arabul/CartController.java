@@ -1,8 +1,11 @@
 package com.example.arabul;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -27,6 +30,10 @@ public class CartController {
         public Integer getProductId() {
             return productId;
         }
+
+        public void setProductId(int i) {
+            productId = i;
+        }
     }
 
     @PostMapping
@@ -48,7 +55,7 @@ public class CartController {
         }
 
         if (repository.isProductLimitExceeded(productId)) {
-            return ResponseEntity.status(422).body(Map.of("info", "Product limit is exceeded"));
+            return ResponseEntity.status(422).body(Map.of("info", "Product limit exceeded"));
         }
 
         try {
@@ -61,7 +68,7 @@ public class CartController {
     }
 
     @GetMapping
-    public ResponseEntity<?> UpdateCart() throws IOException {
+    public ResponseEntity<?> GetCart() throws IOException {
 
         Integer userId = RequestContext.getUserId();
 
@@ -69,21 +76,16 @@ public class CartController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("info", "Unauthorized"));
         }
 
-        try {
-            List<Map<String, Object>> cart = repository.getCart(userId);
+        List<Map<String, Object>> cart = repository.getCart(userId);
 
-            if (cart == null) {
-                return ResponseEntity.ok(List.of());
-            }
-
-            return ResponseEntity.ok(cart);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(500).body(Map.of("info", "Bad request " + e.getMessage()));
+        if (cart == null) {
+            return ResponseEntity.ok(List.of());
         }
 
+        return ResponseEntity.ok(cart);
     }
 
+    @Validated
     @DeleteMapping("/{product_id}")
     public ResponseEntity<?> DeleteProductByCart(@PathVariable Integer product_id) throws IOException {
 
