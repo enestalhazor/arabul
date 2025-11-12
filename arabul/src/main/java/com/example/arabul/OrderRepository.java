@@ -61,6 +61,7 @@ public class OrderRepository {
             orderMap.put("expiration_date", order.get("expiration_date"));
             orderMap.put("first_name", order.get("first_name"));
             orderMap.put("last_name", order.get("last_name"));
+            orderMap.put("order_date", order.get("order_date"));
 
             // get products by order id
             List<Map<String, Object>> products = jdbcTemplate.queryForList(sql2, orderId);

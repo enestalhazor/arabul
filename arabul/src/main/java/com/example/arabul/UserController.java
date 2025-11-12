@@ -60,7 +60,7 @@ public class UserController {
                     return ResponseEntity.status(400).body(Map.of("info", "This is not JPEG file"));
                 }
 
-                Path uploadDir = Paths.get(System.getProperty("user.dir"), "userphotos");
+                Path uploadDir = Paths.get(System.getProperty("user.dir"), "productphotos");
                 Files.createDirectories(uploadDir);
 
                 fileName = Paths.get(profilePic.getOriginalFilename()).getFileName().toString();
@@ -184,7 +184,7 @@ public class UserController {
                 return ResponseEntity.status(400).body(Map.of("info", "This is not JPEG file"));
             }
 
-            Path uploadDir = Paths.get(System.getProperty("user.dir"), "userphotos");
+            Path uploadDir = Paths.get(System.getProperty("user.dir"), "productphotos");
             Files.createDirectories(uploadDir);
 
             fileName = Paths.get(profilePic.getOriginalFilename()).getFileName().toString();
@@ -198,27 +198,25 @@ public class UserController {
                 return ResponseEntity.status(422).body(Map.of("info", "Email taken"));
             }
 
-            if (!email.isBlank() && email != null) {
+            if (email != null && !email.isBlank()) {
                 if (!email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")) {
                     return ResponseEntity.status(400).body(Map.of("info", "Invalid email format"));
                 }
             }
 
-            if (!password.isBlank() && password != null) {
+            if ( password != null && !password.isBlank()) {
                 if (password.length() < 4) {
                     return ResponseEntity.status(400).body(Map.of("info", "Password length should be more than 4 character"));
                 }
             }
 
-            if (!phone.isBlank() && phone != null) {
-                if (phone != null || !phone.isBlank()) {
+            if ( phone != null && !phone.isBlank()) {
                     if (phone.matches("^\\\\d{3}-\\\\d{3}-\\\\d{4}$")) {
                         return ResponseEntity.status(400).body(Map.of("info", "Invalid phone format"));
                     }
-                }
             }
 
-            if (!password.isBlank() && password != null) {
+            if (password != null && !password.isBlank()) {
                 hashedPassword = HashService.hashPassword(password);
             }
 

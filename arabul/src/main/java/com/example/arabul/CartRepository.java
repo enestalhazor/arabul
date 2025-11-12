@@ -48,7 +48,7 @@ public class CartRepository {
     }
 
     public List<Map<String, Object>> getCart(Integer userId) {
-        String sql = "SELECT * FROM cart WHERE user_id=?";
+        String sql = "SELECT * FROM cart c, products p WHERE c.user_id=? AND c.product_id = p.id";
         try {
             return jdbcTemplate.queryForList(sql, userId);
         } catch (EmptyResultDataAccessException e) {
