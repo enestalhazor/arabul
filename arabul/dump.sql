@@ -12,6 +12,7 @@ BEGIN
    END IF;
 END
 $$;
+\restrict MgxzVbXXfBwzQhOubV3YSMgpOWZjeHNFwHA2MokP0G0OiNWQK9ofRACKmq3o7YY
 
 -- Dumped from database version 14.19 (Ubuntu 14.19-0ubuntu0.22.04.1)
 -- Dumped by pg_dump version 14.19 (Ubuntu 14.19-0ubuntu0.22.04.1)
@@ -260,8 +261,11 @@ ALTER TABLE ONLY public.users ALTER COLUMN id SET DEFAULT nextval('public.users_
 --
 
 COPY public.cart (id, user_id, product_id, count) FROM stdin;
-205     31      22      1
-206     31      21      1
+205	31	22	1
+206	31	21	1
+208	25	19	1
+209	25	20	2
+210	31	20	1
 \.
 
 
@@ -270,34 +274,34 @@ COPY public.cart (id, user_id, product_id, count) FROM stdin;
 --
 
 COPY public.order_products (id, order_id, product_id, count) FROM stdin;
-17      8       12      2
-18      8       11      1
-19      9       12      2
-20      9       11      1
-21      10      19      1
-22      11      19      1
-23      12      20      1
-24      12      19      1
-25      12      18      1
-26      12      17      1
-27      12      21      1
-28      12      22      1
-29      13      19      4
-30      13      18      3
-31      13      17      2
-32      13      21      1
-33      14      19      4
-34      14      20      3
-35      14      21      2
-36      15      18      1
-37      15      17      1
-38      15      19      2
-39      16      22      1
-40      16      21      1
-41      16      20      3
-42      17      19      3
-43      17      18      2
-44      18      17      2
+17	8	12	2
+18	8	11	1
+19	9	12	2
+20	9	11	1
+21	10	19	1
+22	11	19	1
+23	12	20	1
+24	12	19	1
+25	12	18	1
+26	12	17	1
+27	12	21	1
+28	12	22	1
+29	13	19	4
+30	13	18	3
+31	13	17	2
+32	13	21	1
+33	14	19	4
+34	14	20	3
+35	14	21	2
+36	15	18	1
+37	15	17	1
+38	15	19	2
+39	16	22	1
+40	16	21	1
+41	16	20	3
+42	17	19	3
+43	17	18	2
+44	18	17	2
 \.
 
 
@@ -306,24 +310,24 @@ COPY public.order_products (id, order_id, product_id, count) FROM stdin;
 --
 
 COPY public.orders (id, user_id, credit_card_number, verification_code, expiration_date, first_name, last_name, order_date) FROM stdin;
-1       25      5555555555555554        554     12/28   Enes    Zor     2025-11-12 20:55:24.390335
-2       25      5555555555555554        554     12/28   Enes    Zor     2025-11-12 20:55:24.390335
-3       25      5555555555555554        554     12/28   Enes    Zor     2025-11-12 20:55:24.390335
-4       25      5555555555555554        554     12/28   Enes    Zor     2025-11-12 20:55:24.390335
-5       25      5555555555555554        554     12/28   Enes    Zor     2025-11-12 20:55:24.390335
-6       25      5555555555555554        554     12/28   Enes    Zor     2025-11-12 20:55:24.390335
-7       25      5555555555555554        554     12/28   Enes    Zor     2025-11-12 20:55:24.390335
-8       25      5555555555555554        554     12/28   Enes    Zor     2025-11-12 20:55:24.390335
-9       25      5555555555555554        554     12/28   Enes    Zor     2025-11-12 20:55:24.390335
-10      15      5555555555555555        555     05/30   Enes    Zor     2025-11-12 20:55:24.390335
-11      15      5555555555555555        555     02/30   Enes    Zor     2025-11-12 20:55:24.390335
-12      15      5555555555555555        555     05/30   Enes    Zor     2025-11-12 20:55:24.390335
-13      15      5555555555555942        555     05/40   Enes Talha      Zor     2025-11-12 20:55:24.390335
-14      15      5555555555557894        555     01/40   Enes    Zor     2025-11-12 20:55:24.390335
-15      31      5444544454449234        549     02/25   Eno     Zor     2025-11-12 20:55:24.390335
-16      31      5444544454442933        543     02/30   Enes    Zor     2025-11-12 20:55:24.390335
-17      31      5555555555553040        552     04/30   Enoş    Zor     2025-11-12 21:02:24.91158
-18      31      5554555455540503        555     02/40   Enes    Zor     2025-11-14 19:54:21.444379
+1	25	5555555555555554	554	12/28	Enes	Zor	2025-11-12 20:55:24.390335
+2	25	5555555555555554	554	12/28	Enes	Zor	2025-11-12 20:55:24.390335
+3	25	5555555555555554	554	12/28	Enes	Zor	2025-11-12 20:55:24.390335
+4	25	5555555555555554	554	12/28	Enes	Zor	2025-11-12 20:55:24.390335
+5	25	5555555555555554	554	12/28	Enes	Zor	2025-11-12 20:55:24.390335
+6	25	5555555555555554	554	12/28	Enes	Zor	2025-11-12 20:55:24.390335
+7	25	5555555555555554	554	12/28	Enes	Zor	2025-11-12 20:55:24.390335
+8	25	5555555555555554	554	12/28	Enes	Zor	2025-11-12 20:55:24.390335
+9	25	5555555555555554	554	12/28	Enes	Zor	2025-11-12 20:55:24.390335
+10	15	5555555555555555	555	05/30	Enes	Zor	2025-11-12 20:55:24.390335
+11	15	5555555555555555	555	02/30	Enes	Zor	2025-11-12 20:55:24.390335
+12	15	5555555555555555	555	05/30	Enes	Zor	2025-11-12 20:55:24.390335
+13	15	5555555555555942	555	05/40	Enes Talha	Zor	2025-11-12 20:55:24.390335
+14	15	5555555555557894	555	01/40	Enes	Zor	2025-11-12 20:55:24.390335
+15	31	5444544454449234	549	02/25	Eno	Zor	2025-11-12 20:55:24.390335
+16	31	5444544454442933	543	02/30	Enes	Zor	2025-11-12 20:55:24.390335
+17	31	5555555555553040	552	04/30	Enoş	Zor	2025-11-12 21:02:24.91158
+18	31	5554555455540503	555	02/40	Enes	Zor	2025-11-14 19:54:21.444379
 \.
 
 
@@ -332,12 +336,12 @@ COPY public.orders (id, user_id, credit_card_number, verification_code, expirati
 --
 
 COPY public.products (id, name, description, photo, price, category) FROM stdin;
-17      Haydo   for davşans     download.jpeg   10.640000343322754      book
-18      Sehmistanın kocbasi     Haydonun kabusu download.jpeg   10.640000343322754      book
-19      Enes    Enesin hikayeleri       download.jpeg   34.41999816894531       book
-20      Talha   Hikaye  download.jpeg   34.41999816894531       book
-21      Zor     Hikaye  1345614.jpeg    34.41999816894531       book
-22      Zor     Hikaye  1345614.jpeg    34.41999816894531       book
+17	Haydo	for davşans	download.jpeg	10.640000343322754	book
+18	Sehmistanın kocbasi	Haydonun kabusu	download.jpeg	10.640000343322754	book
+19	Enes	Enesin hikayeleri	download.jpeg	34.41999816894531	book
+20	Talha	Hikaye	download.jpeg	34.41999816894531	book
+21	Zor	Hikaye	1345614.jpeg	34.41999816894531	book
+22	Zor	Hikaye	1345614.jpeg	34.41999816894531	book
 \.
 
 
@@ -346,22 +350,23 @@ COPY public.products (id, name, description, photo, price, category) FROM stdin;
 --
 
 COPY public.users (id, name, email, phone, password, address, profile_picture) FROM stdin;
-16      talha   talha@admin.com 5000000000      WZRHGrsBESr8wYFZ9sx0tPURuZgG2lmzyvWpwXPKz8U=    ankara/etimesgut
-17              mesude@admin.com        5000000001      WZRHGrsBESr8wYFZ9sx0tPURuZgG2lmzyvWpwXPKz8U=    ankara/etimesgut
-18      asdsd   asadasd@admin.com       5050505050      A6xnQhbz4Vx2HuGl4lXwZ5U2I8iziLRFnhP5eNfIRvQ=    ankara/etimesgut
-19      asd     ASASd@admin.com 5050505052      A6xnQhbz4Vx2HuGl4lXwZ5U2I8iziLRFnhP5eNfIRvQ=    ankara/etimesgut
-20      ease    ease@gmail.com  5050505056      A6xnQhbz4Vx2HuGl4lXwZ5U2I8iziLRFnhP5eNfIRvQ=    ankara/etimesgut
-21              ase@gmail.com   5050505059      A6xnQhbz4Vx2HuGl4lXwZ5U2I8iziLRFnhP5eNfIRvQ=    ankara/etimesgut
-22              adasdasdasdsd@gmail.com 5050505057      WZRHGrsBESr8wYFZ9sx0tPURuZgG2lmzyvWpwXPKz8U=    ankara/etimesgut
-23      asdsdafgh       fatih@gmail.c   5071525360      WZRHGrsBESr8wYFZ9sx0tPURuZgG2lmzyvWpwXPKz8U=    ankara/etimesgut
-25      enes    enes@gmail.com  5071525361      0QKtcVQzF1jYEiriTWLGQThAwdmFNbj5AUqMa9RM0Ls=    ankara/etimesgut
-26      zor     zor@gmail.com   5529720554      jZae727K08KaOmKSgOaGzww/XVqGr/PKEgIMkjrcbJI=    etimesgut/ankara
-27      qwe     qwe@gmail.com   5540304300      A6xnQhbz4Vx2HuGl4lXwZ5U2I8iziLRFnhP5eNfIRvQ=    ankara/etimesgut
-28      qwer    qwer@gmail.com  5312234433      A6xnQhbz4Vx2HuGl4lXwZ5U2I8iziLRFnhP5eNfIRvQ=    ankara/etimesgut        rabbit.jpeg
-15      Enes    Enes@admin.com  5943042030      0QKtcVQzF1jYEiriTWLGQThAwdmFNbj5AUqMa9RM0Ls=    ankara/etimesgut        1345614.jpeg
-29      haydo   haydo@gmail.com 5348348428      WZRHGrsBESr8wYFZ9sx0tPURuZgG2lmzyvWpwXPKz8U=    ankara/etimesgut        rabbit.jpeg
-30      davsan  davsan@gmail.com        5389599294      WZRHGrsBESr8wYFZ9sx0tPURuZgG2lmzyvWpwXPKz8U=    etimesgut/ankara        rabbit.jpeg
-31      Enes    eno@gmail.com   5594994939      WZRHGrsBESr8wYFZ9sx0tPURuZgG2lmzyvWpwXPKz8U=    ankara/elvankent        rabbit.jpeg
+16	talha	talha@admin.com	5000000000	WZRHGrsBESr8wYFZ9sx0tPURuZgG2lmzyvWpwXPKz8U=	ankara/etimesgut	
+17		mesude@admin.com	5000000001	WZRHGrsBESr8wYFZ9sx0tPURuZgG2lmzyvWpwXPKz8U=	ankara/etimesgut	
+18	asdsd	asadasd@admin.com	5050505050	A6xnQhbz4Vx2HuGl4lXwZ5U2I8iziLRFnhP5eNfIRvQ=	ankara/etimesgut	
+19	asd	ASASd@admin.com	5050505052	A6xnQhbz4Vx2HuGl4lXwZ5U2I8iziLRFnhP5eNfIRvQ=	ankara/etimesgut	
+20	ease	ease@gmail.com	5050505056	A6xnQhbz4Vx2HuGl4lXwZ5U2I8iziLRFnhP5eNfIRvQ=	ankara/etimesgut	
+21		ase@gmail.com	5050505059	A6xnQhbz4Vx2HuGl4lXwZ5U2I8iziLRFnhP5eNfIRvQ=	ankara/etimesgut	
+22		adasdasdasdsd@gmail.com	5050505057	WZRHGrsBESr8wYFZ9sx0tPURuZgG2lmzyvWpwXPKz8U=	ankara/etimesgut	
+23	asdsdafgh	fatih@gmail.c	5071525360	WZRHGrsBESr8wYFZ9sx0tPURuZgG2lmzyvWpwXPKz8U=	ankara/etimesgut	
+25	enes	enes@gmail.com	5071525361	0QKtcVQzF1jYEiriTWLGQThAwdmFNbj5AUqMa9RM0Ls=	ankara/etimesgut	
+26	zor	zor@gmail.com	5529720554	jZae727K08KaOmKSgOaGzww/XVqGr/PKEgIMkjrcbJI=	etimesgut/ankara	
+27	qwe	qwe@gmail.com	5540304300	A6xnQhbz4Vx2HuGl4lXwZ5U2I8iziLRFnhP5eNfIRvQ=	ankara/etimesgut	
+28	qwer	qwer@gmail.com	5312234433	A6xnQhbz4Vx2HuGl4lXwZ5U2I8iziLRFnhP5eNfIRvQ=	ankara/etimesgut	rabbit.jpeg
+15	Enes	Enes@admin.com	5943042030	0QKtcVQzF1jYEiriTWLGQThAwdmFNbj5AUqMa9RM0Ls=	ankara/etimesgut	1345614.jpeg
+29	haydo	haydo@gmail.com	5348348428	WZRHGrsBESr8wYFZ9sx0tPURuZgG2lmzyvWpwXPKz8U=	ankara/etimesgut	rabbit.jpeg
+30	davsan	davsan@gmail.com	5389599294	WZRHGrsBESr8wYFZ9sx0tPURuZgG2lmzyvWpwXPKz8U=	etimesgut/ankara	rabbit.jpeg
+32	nevzat	nevzat@gmail.com	5939993092	WZRHGrsBESr8wYFZ9sx0tPURuZgG2lmzyvWpwXPKz8U=	ankara/elv	rabbit.jpeg
+31	Enosss	eno@gmail.com	5594994939	WZRHGrsBESr8wYFZ9sx0tPURuZgG2lmzyvWpwXPKz8U=	ankara/elvankent	rabbit.jpeg
 \.
 
 
@@ -369,7 +374,7 @@ COPY public.users (id, name, email, phone, password, address, profile_picture) F
 -- Name: cart_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.cart_id_seq', 206, true);
+SELECT pg_catalog.setval('public.cart_id_seq', 210, true);
 
 
 --
@@ -397,7 +402,7 @@ SELECT pg_catalog.setval('public.products_id_seq', 22, true);
 -- Name: users_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.users_id_seq', 31, true);
+SELECT pg_catalog.setval('public.users_id_seq', 32, true);
 
 
 --
@@ -459,4 +464,6 @@ ALTER TABLE ONLY public.users
 --
 -- PostgreSQL database dump complete
 --
+
+\unrestrict MgxzVbXXfBwzQhOubV3YSMgpOWZjeHNFwHA2MokP0G0OiNWQK9ofRACKmq3o7YY
 
