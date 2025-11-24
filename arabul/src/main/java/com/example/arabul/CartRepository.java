@@ -58,8 +58,8 @@ public class CartRepository {
 
     public void deleteProductByCart(Integer productId, Integer userId) {
 
-        String sql = "SELECT \"count\" FROM cart WHERE product_id=?";
-        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, productId);
+        String sql = "SELECT \"count\" FROM cart WHERE product_id=? AND user_id=?";
+        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, productId, userId);
 
         if (count == null) {
             return;
