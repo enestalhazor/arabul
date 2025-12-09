@@ -46,7 +46,6 @@ public class UserController {
         String fileName = "";
 
         try {
-
             if (profilePic != null && !profilePic.isEmpty()) {
 
                 String contentType = profilePic.getContentType();

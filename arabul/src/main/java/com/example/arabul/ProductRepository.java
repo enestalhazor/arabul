@@ -60,7 +60,6 @@ public class ProductRepository {
         }
     }
 
-
     public boolean deleteById(Integer id) {
         String sql = "DELETE FROM products WHERE id=?";
         try {

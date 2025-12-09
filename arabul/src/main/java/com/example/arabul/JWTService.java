@@ -20,7 +20,6 @@ public class JWTService {
 
     public static String create(String email, Integer id) {
         try {
-
             String jwt = Jwts.builder()
                     .claim("id", id)
                     .claim("email", email)

@@ -7,8 +7,6 @@ public class RequestContext {
     private static final ThreadLocal<Integer> userIdHolder = new ThreadLocal<>();
     private static final ThreadLocal<String> userEmailHolder = new ThreadLocal<>();
 
-    //private static final Integer id;  = single thread, not thread safe
-
     public static void setUserId(Integer id) {
         userIdHolder.set(id);
     }

@@ -26,7 +26,6 @@ public class ProductController {
         String fileName = "";
 
         try {
-
             if (photo != null && !photo.isEmpty()) {
                 Path uploadDir = Paths.get(System.getProperty("user.dir"), "productphotos");
                 Files.createDirectories(uploadDir);

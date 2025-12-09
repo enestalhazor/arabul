@@ -11,9 +11,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-// create a filter named LoggingFilter for each request print date, request method, path and "STARTED".
-// then execute all filters and controllers then print the same things and "ENDED"
-
 @Component
 public class JWTFilter extends OncePerRequestFilter {
     @Override

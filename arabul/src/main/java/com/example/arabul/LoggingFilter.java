@@ -11,9 +11,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.util.Date;
 
-// create a filter named LoggingFilter for each request print date, request method, path and "STARTED".
-// then execute all filters and controllers then print the same things and "ENDED"
-
 @Component
 public class LoggingFilter extends OncePerRequestFilter {
     @Override
