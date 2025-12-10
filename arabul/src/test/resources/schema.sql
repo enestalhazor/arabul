@@ -19,4 +19,4 @@ create table public.users (
 
 insert into products (name, description, photo, price, category) VALUES ('hikayeler', 'hikaye', 'hikaye.jpg', 123.50, 'book');
 insert into products (name, description, photo, price, category) VALUES ('masallar', 'masal', 'masal.jpg', 123.50, 'book');
-insert into users (name, email, phone, password, address, profile_picture) VALUES ('enes', 'enes@gmail.com', '5519710453', '12345', 'ankara/etimesgut', 'enes.jpeg');
+insert into users (name, email, phone, password, address, profile_picture) VALUES ('enes', 'enes@gmail.com', '5519710453', 'WZRHGrsBESr8wYFZ9sx0tPURuZgG2lmzyvWpwXPKz8U=', 'ankara/etimesgut', 'enes.jpeg');

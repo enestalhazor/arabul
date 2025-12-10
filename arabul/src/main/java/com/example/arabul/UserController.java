@@ -1,10 +1,12 @@
 package com.example.arabul;
 
-import com.auth0.jwt.JWT;
-import org.springframework.format.annotation.DateTimeFormat;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+import org.apache.coyote.Response;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -13,11 +15,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.NoSuchAlgorithmException;
-import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
+@Validated
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
@@ -42,10 +44,15 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<?> Register(@RequestParam String name, @RequestParam String email, @RequestParam(value = "phone", required = false) String phone, @RequestParam String password, @RequestParam String address, @RequestParam(value = "profile_picture", required = false) MultipartFile profilePic) throws IOException {
-        String fileName = "";
+    public ResponseEntity<?> Register(@NotBlank(message = "Name cannot be empty") @RequestParam String name,
+                                      @NotBlank(message = "Email cannot be empty") @RequestParam String email,
+                                      @RequestParam(value = "phone", required = false) String phone,
+                                      @NotBlank(message = "Password cannot be empty") @Size(min = 4, message = "Password should be more than 4 characters") @RequestParam String password,
+                                      @NotBlank(message = "Address cannot be empty") @RequestParam String address,
+                                      @RequestParam(value = "profile_picture", required = false) MultipartFile profilePic) throws IOException {
 
         try {
+            String fileName = "";
             if (profilePic != null && !profilePic.isEmpty()) {
 
                 String contentType = profilePic.getContentType();
@@ -53,19 +60,12 @@ public class UserController {
                     return ResponseEntity.status(400).body(Map.of("info", "This is not JPEG file"));
                 }
 
-                Path uploadDir = Paths.get(System.getProperty("user.dir"), "userphotos");
+                Path uploadDir = Paths.get(System.getProperty("user.dir"), "productphotos");
                 Files.createDirectories(uploadDir);
 
                 fileName = Paths.get(profilePic.getOriginalFilename()).getFileName().toString();
                 Path uploadPath = uploadDir.resolve(fileName);
                 profilePic.transferTo(uploadPath.toFile());
-            }
-
-            if (name == null || name.isBlank() ||
-                    email == null || email.isBlank() ||
-                    password == null || password.isBlank() ||
-                    address == null || address.isBlank()) {
-                return ResponseEntity.status(400).body(Map.of("info", "Missing required fields"));
             }
 
             if (repository.checkIsEmailTaken(email)) {
@@ -76,12 +76,8 @@ public class UserController {
                 return ResponseEntity.status(400).body(Map.of("info", "Invalid email format"));
             }
 
-            if (password.length() < 4) {
-                return ResponseEntity.status(400).body(Map.of("info", "Password length should be more than 4 character"));
-            }
-
-            if (phone != null || !phone.isBlank()) {
-                if (phone.matches("^\\\\d{3}-\\\\d{3}-\\\\d{4}$")) {
+            if (phone != null && !phone.isBlank()) {
+                if (!phone.matches("^5\\d{9}$")) {
                     return ResponseEntity.status(400).body(Map.of("info", "Invalid phone format"));
                 }
             }
@@ -89,13 +85,13 @@ public class UserController {
             String hashedPassword = HashService.hashPassword(password);
 
             if (repository.save(name, email, phone, hashedPassword, address, fileName)) {
-                return ResponseEntity.ok().body(Map.of("info", "User ınserted"));
+                return ResponseEntity.ok().body(Map.of("info", "User inserted"));
             } else {
                 return ResponseEntity.badRequest().body(Map.of("info", "Bad Request"));
             }
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.status(500).body(Map.of("info", "Bad request " + e.getMessage()));
+            return ResponseEntity.status(400).body(Map.of("info", "Bad request " + e.getMessage()));
         }
     }
 
@@ -104,12 +100,12 @@ public class UserController {
 
         if (request.getPassword() == null || request.getPassword().isBlank() ||
                 request.getEmail() == null || request.getEmail().isBlank()) {
-            return ResponseEntity.status(400).body(Map.of("info", "Missing required fields"));
+            return ResponseEntity.status(400).body(Map.of("info", "Missing required field or fields"));
         }
         try {
             String hashedPassword = HashService.hashPassword(request.getPassword());
             Integer id = repository.check(request.getEmail(), hashedPassword);
-            if (id != null || id > 0) {
+            if (id != null && id > 0) {
 
                 String email = request.getEmail();
                 String token = JWTService.create(email, id);
@@ -127,25 +123,35 @@ public class UserController {
         }
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<?> GetUserInfo(@RequestHeader(value = "Authorization", required = false) String authHeader, @PathVariable Integer id) throws NoSuchAlgorithmException {
+    private Map<String, Object> lowerCaseMap(Map<String, Object> map) {
+        Map<String, Object> lowerCaseMap = new HashMap<>();
 
-        if (!JWTService.checkToken(authHeader)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("info", "Missing or invalid Authorization header"));
+        for (Map.Entry<String, Object> entry : map.entrySet()) {
+            lowerCaseMap.put(entry.getKey().toLowerCase(), entry.getValue());
+        }
+
+        return lowerCaseMap;
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<?> GetUserInfo(@PathVariable Integer id) throws NoSuchAlgorithmException {
+
+        if (id != RequestContext.getUserId()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("info", "Unauthorized"));
         }
 
         try {
+
             var products = repository.userById(id);
 
             if (products == null || products.isEmpty()) {
-                return ResponseEntity.status(404).body(Map.of("info", "No user found for id: " + id));
+                return ResponseEntity.status(404).body(Map.of("info", "Not found user for id: " + id));
             }
 
             Integer userid = RequestContext.getUserId();
 
             if (Objects.equals(userid, id)) {
-                return ResponseEntity.ok(products);
+                return ResponseEntity.ok(lowerCaseMap(products));
             }
 
             return null;
@@ -158,7 +164,6 @@ public class UserController {
 
     @PutMapping("/{id}")
     public ResponseEntity<?> EditUserInfo(@PathVariable Integer id,
-                                          @RequestHeader(value = "Authorization", required = false) String authHeader,
                                           @RequestParam(value = "name", required = false) String name,
                                           @RequestParam(value = "email", required = false) String email,
                                           @RequestParam(value = "phone", required = false) String phone,
@@ -166,9 +171,8 @@ public class UserController {
                                           @RequestParam(value = "address", required = false) String address,
                                           @RequestParam(value = "profile_picture", required = false) MultipartFile profilePic) throws NoSuchAlgorithmException, IOException {
 
-        if (!JWTService.checkToken(authHeader)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("info", "Missing or invalid Authorization header"));
+        if (id != RequestContext.getUserId()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("info", "Unauthorized"));
         }
 
         String fileName = "";
@@ -180,7 +184,7 @@ public class UserController {
                 return ResponseEntity.status(400).body(Map.of("info", "This is not JPEG file"));
             }
 
-            Path uploadDir = Paths.get(System.getProperty("user.dir"), "userphotos");
+            Path uploadDir = Paths.get(System.getProperty("user.dir"), "productphotos");
             Files.createDirectories(uploadDir);
 
             fileName = Paths.get(profilePic.getOriginalFilename()).getFileName().toString();
@@ -194,27 +198,25 @@ public class UserController {
                 return ResponseEntity.status(422).body(Map.of("info", "Email taken"));
             }
 
-            if (!email.isBlank() && email != null) {
+            if (email != null && !email.isBlank()) {
                 if (!email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")) {
                     return ResponseEntity.status(400).body(Map.of("info", "Invalid email format"));
                 }
             }
 
-            if (!password.isBlank() && password != null) {
+            if ( password != null && !password.isBlank()) {
                 if (password.length() < 4) {
                     return ResponseEntity.status(400).body(Map.of("info", "Password length should be more than 4 character"));
                 }
             }
 
-            if (!phone.isBlank() && phone != null) {
-                if (phone != null || !phone.isBlank()) {
+            if ( phone != null && !phone.isBlank()) {
                     if (phone.matches("^\\\\d{3}-\\\\d{3}-\\\\d{4}$")) {
                         return ResponseEntity.status(400).body(Map.of("info", "Invalid phone format"));
                     }
-                }
             }
 
-            if (!password.isBlank() && password != null) {
+            if (password != null && !password.isBlank()) {
                 hashedPassword = HashService.hashPassword(password);
             }
 
@@ -225,10 +227,11 @@ public class UserController {
             }
 
             Integer userId = RequestContext.getUserId();
+            Integer userId2 = repository.getIdByEmail(email);
 
-            if (Objects.equals(userId, result)) {
+            if (Objects.equals(userId, userId2)) {
 
-                return ResponseEntity.ok(Map.of("info", "User infos edited id: " + result));
+                return ResponseEntity.ok(Map.of("info", "User infos edited id: " + userId2));
             }
             return null;
         } catch (Exception e) {

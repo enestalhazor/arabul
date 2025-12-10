@@ -17,8 +17,9 @@ public class JWTFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException, java.io.IOException {
         try {
-            String token = request.getHeader("Authorization");
-            if (token != null) {
+            String autho = request.getHeader("Authorization");
+            if (autho != null && autho.startsWith("Bearer ")) {
+                String token = autho.substring(7); // remove "Bearer"
 
                 Claims claims = Jwts.parserBuilder()
                         .setSigningKey(JWTService.getKey())

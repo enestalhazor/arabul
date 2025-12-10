@@ -15,17 +15,6 @@ public class UserRepository {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    public boolean save(String name, String email, String phone, String password, String address, String profilePic) {
-
-        String sql = "INSERT INTO users(name, email, phone, password, address, profile_picture) VALUES (?, ?, ?, ?, ?, ?)";
-        try {
-            return jdbcTemplate.update(sql, name, email, phone, password, address, profilePic) > 0;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
     public boolean checkIsEmailTaken(String email) {
 
         String sql = "SELECT COUNT(*) FROM users WHERE email=?";
@@ -33,6 +22,17 @@ public class UserRepository {
             Integer count = jdbcTemplate.queryForObject(sql, Integer.class, email);
             return count != null && count > 0;
         } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public boolean save(String name, String email, String phone, String password, String address, String profilePic) {
+
+        String sql = "INSERT INTO users(name, email, phone, password, address, profile_picture) VALUES (?, ?, ?, ?, ?, ?)";
+        try {
+            return jdbcTemplate.update(sql, name, email, phone, password, address, profilePic) > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
             return false;
         }
     }
@@ -56,6 +56,17 @@ public class UserRepository {
         } catch (Exception e) {
             e.printStackTrace();
             return Map.of();
+        }
+    }
+
+    public Integer getIdByEmail(String email) {
+
+        String sql = "SELECT id FROM users WHERE email=?";
+        try {
+            return jdbcTemplate.queryForObject(sql, Integer.class, email);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return -1;
         }
     }
 
@@ -94,10 +105,10 @@ public class UserRepository {
             }
 
             sql.setLength(sql.length() - 2);
-            sql.append(" WHERE id=? RETURNING id");
+            sql.append(" WHERE id=?");
             params.add(id);
 
-            return jdbcTemplate.queryForObject(sql.toString(), Integer.class, params.toArray());
+            return jdbcTemplate.update(sql.toString(), params.toArray()) > 0 ? 1 : -1;
         } catch (Exception e) {
             e.printStackTrace();
             return -1;

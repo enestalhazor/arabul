@@ -4,8 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -15,9 +13,9 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import java.io.File;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -52,19 +50,6 @@ class ProductControllerTests {
                 .param("category", "book"));
     }
 
-    // missing file
-    @Test
-    @Transactional
-    void testCreateProductMissingRequiredField() throws Exception {
-        var resultActions = mockMvc.perform(MockMvcRequestBuilders.multipart("/api/products")
-                .param("name", "masallar")
-                .param("description", "masal")
-                // price is missing here
-                .param("category", "book"));
-
-        resultActions.andExpect(status().isBadRequest());
-    }
-
     // missing name
     @Test
     @Transactional
@@ -75,13 +60,14 @@ class ProductControllerTests {
                 "image/jpeg",
                 "dummy-image-content".getBytes());
 
-        var resultActions = mockMvc.perform(MockMvcRequestBuilders.multipart("/api/products")
-                .file(file)
-                .param("description", "masal")
-                .param("price", "196.50")
-                .param("category", "book"));
+        mockMvc.perform(MockMvcRequestBuilders.multipart("/api/products")
+                        .file(file)
+                        .param("description", "masal")
+                        .param("price", "196.50")
+                        .param("category", "book"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.info").value("Missing required fields"));
 
-        resultActions.andExpect(status().isBadRequest());
     }
 
     // missing description
@@ -94,13 +80,14 @@ class ProductControllerTests {
                 "image/jpeg",
                 "dummy-image-content".getBytes());
 
-        var resultActions = mockMvc.perform(MockMvcRequestBuilders.multipart("/api/products")
-                .file(file)
-                .param("name", "masallar")
-                .param("price", "196.50")
-                .param("category", "book"));
+        mockMvc.perform(MockMvcRequestBuilders.multipart("/api/products")
+                        .file(file)
+                        .param("name", "masallar")
+                        .param("price", "196.50")
+                        .param("category", "book"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.info").value("Missing required fields"));
 
-        resultActions.andExpect(status().isBadRequest());
     }
 
     // missing price
@@ -113,13 +100,14 @@ class ProductControllerTests {
                 "image/jpeg",
                 "dummy-image-content".getBytes());
 
-        var resultActions = mockMvc.perform(MockMvcRequestBuilders.multipart("/api/products")
-                .file(file)
-                .param("name", "masallar")
-                .param("description", "masal")
-                .param("category", "book"));
+        mockMvc.perform(MockMvcRequestBuilders.multipart("/api/products")
+                        .file(file)
+                        .param("name", "masallar")
+                        .param("description", "masal")
+                        .param("category", "book"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.info").value("Missing required fields"));
 
-        resultActions.andExpect(status().isBadRequest());
     }
 
     // missing category
@@ -132,14 +120,14 @@ class ProductControllerTests {
                 "image/jpeg",
                 "dummy-image-content".getBytes());
 
-        var resultActions = mockMvc.perform(MockMvcRequestBuilders.multipart("/api/products")
-                .file(file)
-                .param("name", "masallar")
-                .param("description", "masal")
-                .param("price", "196.50"));
+        mockMvc.perform(MockMvcRequestBuilders.multipart("/api/products")
+                        .file(file)
+                        .param("name", "masallar")
+                        .param("description", "masal")
+                        .param("price", "196.50"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.info").value("Missing required fields"));
 
-
-        resultActions.andExpect(status().isBadRequest());
     }
 
     @Test
@@ -176,15 +164,18 @@ class ProductControllerTests {
     @Test
     @Transactional
     void testDeleteProductsOk() throws Exception {
-        var mvcResult = mockMvc.perform(delete("/api/products/1"))
-                .andExpect(status().isOk());
+        mockMvc.perform(delete("/api/products/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.info").value("Product deleted"));
+
     }
 
     @Test
     @Transactional
     void testDeleteProductsOk1() throws Exception {
-        var mvcResult = mockMvc.perform(delete("/api/products/3"))
-                .andExpect(status().isNotFound());
+        mockMvc.perform(delete("/api/products/3"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.info").value("Not found"));
     }
 
     @Test
@@ -205,8 +196,8 @@ class ProductControllerTests {
 
     @Test
     @Transactional
-    void testByIdProductsOk1() throws Exception {
-        var mvcResult = mockMvc.perform(get("/api/products/3"))
+    void testByIdProductsNotFound() throws Exception {
+        mockMvc.perform(get("/api/products/3"))
                 .andExpect(status().isNotFound());
     }
 
@@ -229,9 +220,10 @@ class ProductControllerTests {
 
     @Test
     @Transactional
-    void testByTermProductsOk1() throws Exception {
+    void testByTermProductsNotFound() throws Exception {
 
-        var mvcResult = mockMvc.perform(get("/api/products/search?term=tarraklar"))
-                .andExpect(status().isNotFound());
+        mockMvc.perform(get("/api/products/search?term=tarraklar"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.info").value("No products found for term: tarraklar"));
     }
 }
